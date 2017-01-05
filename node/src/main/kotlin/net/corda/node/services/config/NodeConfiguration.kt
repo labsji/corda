@@ -13,17 +13,21 @@ import net.corda.node.utilities.TestClock
 import java.nio.file.Path
 import java.util.*
 
+// TODO Rename this to SSLConfiguration as it's also used by non-node components
 interface NodeSSLConfiguration {
     val keyStorePassword: String
     val trustStorePassword: String
+    // TODO Rename to certificatesDirectory
     val certificatesPath: Path
+    // TODO Rename to keyStoreFile
     val keyStorePath: Path get() = certificatesPath / "sslkeystore.jks"
+    // TODO Rename to trustStoreFile
     val trustStorePath: Path get() = certificatesPath / "truststore.jks"
 }
 
 interface NodeConfiguration : NodeSSLConfiguration {
-    val basedir: Path
-    override val certificatesPath: Path get() = basedir / "certificates"
+    val baseDirectory: Path
+    override val certificatesPath: Path get() = baseDirectory / "certificates"
     val myLegalName: String
     val networkMapService: NetworkMapInfo?
     val nearestCity: String
@@ -35,7 +39,7 @@ interface NodeConfiguration : NodeSSLConfiguration {
 }
 
 class FullNodeConfiguration(val config: Config) : NodeConfiguration {
-    override val basedir: Path by config
+    override val baseDirectory: Path by config
     override val myLegalName: String by config
     override val nearestCity: String by config
     override val emailAddress: String by config

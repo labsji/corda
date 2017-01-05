@@ -25,24 +25,18 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.javaType
 
 object ConfigHelper {
-    val log = loggerFor<ConfigHelper>()
+    private val log = loggerFor<ConfigHelper>()
 
-    fun loadConfig(baseDirectoryPath: Path,
+    fun loadConfig(baseDirectory: Path,
                    configFileOverride: Path? = null,
                    allowMissingConfig: Boolean = false,
                    configOverrides: Map<String, Any?> = emptyMap()): Config {
-
         val defaultConfig = ConfigFactory.parseResources("reference.conf", ConfigParseOptions.defaults().setAllowMissing(false))
 
-        val normalisedBaseDir = baseDirectoryPath.normalize()
-        val configFile = (configFileOverride?.normalize() ?: normalisedBaseDir / "node.conf").toFile()
-        val appConfig = ConfigFactory.parseFile(configFile, ConfigParseOptions.defaults().setAllowMissing(allowMissingConfig))
+        val configFile = configFileOverride ?: baseDirectory / "node.conf"
+        val appConfig = ConfigFactory.parseFile(configFile.toFile(), ConfigParseOptions.defaults().setAllowMissing(allowMissingConfig))
 
-        val overridesMap = HashMap<String, Any?>() // If we do require a few other command line overrides eg for a nicer development experience they would go inside this map.
-        overridesMap.putAll(configOverrides)
-        overridesMap["basedir"] = normalisedBaseDir.toAbsolutePath().toString()
-        val overrideConfig = ConfigFactory.parseMap(overridesMap)
-
+        val overrideConfig = ConfigFactory.parseMap(configOverrides)
         val mergedAndResolvedConfig = overrideConfig.withFallback(appConfig).withFallback(defaultConfig).resolve()
         log.info("Config:\n ${mergedAndResolvedConfig.root().render(ConfigRenderOptions.defaults())}")
         return mergedAndResolvedConfig
@@ -74,12 +68,9 @@ class OptionalConfig<out T>(val conf: Config, val lambda: () -> T) {
     operator fun getValue(receiver: Any, metadata: KProperty<*>): T {
         return if (conf.hasPath(metadata.name)) conf.getValue(receiver, metadata) else lambda()
     }
-
 }
 
-fun <T> Config.getOrElse(lambda: () -> T): OptionalConfig<T> {
-    return OptionalConfig(this, lambda)
-}
+fun <T> Config.getOrElse(lambda: () -> T): OptionalConfig<T> = OptionalConfig(this, lambda)
 
 fun Config.getProperties(path: String): Properties {
     val obj = this.getObject(path)

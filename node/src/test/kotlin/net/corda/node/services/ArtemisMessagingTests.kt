@@ -69,7 +69,7 @@ class ArtemisMessagingTests {
     fun setUp() {
         userService = RPCUserServiceImpl(FullNodeConfiguration(ConfigFactory.empty()))
         config = TestNodeConfiguration(
-                basedir = temporaryFolder.newFolder().toPath(),
+                baseDirectory = temporaryFolder.newFolder().toPath(),
                 myLegalName = "me",
                 networkMapService = null)
         LogHelper.setLevel(PersistentUniquenessProvider::class)

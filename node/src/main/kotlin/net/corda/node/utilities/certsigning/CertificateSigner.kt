@@ -1,6 +1,5 @@
 package net.corda.node.utilities.certsigning
 
-import joptsimple.OptionParser
 import net.corda.core.*
 import net.corda.core.crypto.X509Utilities
 import net.corda.core.crypto.X509Utilities.CORDA_CLIENT_CA
@@ -9,12 +8,12 @@ import net.corda.core.crypto.X509Utilities.CORDA_ROOT_CA
 import net.corda.core.crypto.X509Utilities.addOrReplaceCertificate
 import net.corda.core.crypto.X509Utilities.addOrReplaceKey
 import net.corda.core.utilities.loggerFor
-import net.corda.node.services.config.ConfigHelper
+import net.corda.node.ArgsParser
 import net.corda.node.services.config.FullNodeConfiguration
 import net.corda.node.services.config.NodeConfiguration
 import net.corda.node.services.config.getValue
+import net.corda.node.utilities.certsigning.CertificateSigner.Companion.log
 import java.net.URL
-import java.nio.file.Paths
 import java.security.KeyPair
 import java.security.cert.Certificate
 import kotlin.system.exitProcess
@@ -112,30 +111,21 @@ class CertificateSigner(val config: NodeConfiguration, val certService: Certific
     }
 }
 
-object ParamsSpec {
-    val parser = OptionParser()
-    val baseDirectoryArg = parser.accepts("base-dir", "Working directory of Corda Node.").withRequiredArg().defaultsTo(".")
-    val configFileArg = parser.accepts("config-file", "The path to the config file.").withRequiredArg()
-}
-
 fun main(args: Array<String>) {
+    val argsParser = ArgsParser()
     val cmdlineOptions = try {
-        ParamsSpec.parser.parse(*args)
+        argsParser.parse(*args)
     } catch (ex: Exception) {
-        CertificateSigner.log.error("Unable to parse args", ex)
-        ParamsSpec.parser.printHelpOn(System.out)
+        log.error("Unable to parse args", ex)
+        argsParser.printHelp(System.out)
         exitProcess(1)
     }
-    val baseDirectoryPath = Paths.get(cmdlineOptions.valueOf(ParamsSpec.baseDirectoryArg))
-    val configFile = if (cmdlineOptions.has(ParamsSpec.configFileArg)) Paths.get(cmdlineOptions.valueOf(ParamsSpec.configFileArg)) else null
-
-    val config = ConfigHelper.loadConfig(baseDirectoryPath, configFile, allowMissingConfig = true).let { config ->
-        object : NodeConfiguration by FullNodeConfiguration(config) {
-            val certificateSigningService: URL by config
-        }
+    val config = cmdlineOptions.loadConfig(allowMissingConfig = true)
+    val configuration = object : NodeConfiguration by FullNodeConfiguration(config) {
+        val certificateSigningService: URL by config
     }
 
     // TODO: Use HTTPS instead
-    CertificateSigner(config, HTTPCertificateSigningService(config.certificateSigningService)).buildKeyStore()
+    CertificateSigner(configuration, HTTPCertificateSigningService(configuration.certificateSigningService)).buildKeyStore()
 }
 

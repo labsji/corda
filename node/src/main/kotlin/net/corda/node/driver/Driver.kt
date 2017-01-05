@@ -365,7 +365,7 @@ open class DriverDSL(
         ) + customOverrides
 
         val config = ConfigHelper.loadConfig(
-                baseDirectoryPath = baseDirectory,
+                baseDirectory = baseDirectory,
                 allowMissingConfig = true,
                 configOverrides = configOverrides
         )
@@ -418,7 +418,7 @@ open class DriverDSL(
 
         val baseDirectory = driverDirectory / networkMapLegalName
         val config = ConfigHelper.loadConfig(
-                baseDirectoryPath = baseDirectory,
+                baseDirectory = baseDirectory,
                 allowMissingConfig = true,
                 configOverrides = mapOf(
                         "myLegalName" to networkMapLegalName,
@@ -453,7 +453,7 @@ open class DriverDSL(
                 debugPort: Int?
         ): ListenableFuture<Process> {
             // Write node.conf
-            writeConfig(nodeConf.basedir, "node.conf", nodeConf.config)
+            writeConfig(nodeConf.baseDirectory, "node.conf", nodeConf.config)
 
             val className = "net.corda.node.MainKt" // cannot directly get class for this, so just use string
             val separator = System.getProperty("file.separator")
@@ -468,11 +468,11 @@ open class DriverDSL(
             val javaArgs = listOf(path) +
                     listOf("-Dname=${nodeConf.myLegalName}", "-javaagent:$quasarJarPath") + debugPortArg +
                     listOf("-cp", classpath, className) +
-                    "--base-directory=${nodeConf.basedir}"
+                    "--base-directory=${nodeConf.baseDirectory}"
             val builder = ProcessBuilder(javaArgs)
             builder.redirectError(Paths.get("error.$className.log").toFile())
             builder.inheritIO()
-            builder.directory(nodeConf.basedir.toFile())
+            builder.directory(nodeConf.baseDirectory.toFile())
             val process = builder.start()
             return Futures.allAsList(
                     addressMustBeBound(executorService, nodeConf.artemisAddress),

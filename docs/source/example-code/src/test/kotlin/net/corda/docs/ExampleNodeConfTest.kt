@@ -19,7 +19,7 @@ class ExampleNodeConfTest {
             val configResource = ExampleNodeConfTest::class.java.classLoader.getResource(it)
             val nodeConfig = FullNodeConfiguration(
                     ConfigHelper.loadConfig(
-                            baseDirectoryPath = Paths.get("some-example-base-dir"),
+                            baseDirectory = Paths.get("some-example-base-dir"),
                             configFileOverride = Paths.get(configResource.toURI())
                     )
             )

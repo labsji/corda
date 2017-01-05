@@ -79,7 +79,7 @@ abstract class NodeBasedTest {
                                   rpcUsers: List<User>,
                                   configOverrides: Map<String, Any>): ListenableFuture<Node> {
         val config = ConfigHelper.loadConfig(
-                baseDirectoryPath = (tempFolder.root.toPath() / legalName).createDirectories(),
+                baseDirectory = (tempFolder.root.toPath() / legalName).createDirectories(),
                 allowMissingConfig = true,
                 configOverrides = mapOf(
                         "myLegalName" to legalName,

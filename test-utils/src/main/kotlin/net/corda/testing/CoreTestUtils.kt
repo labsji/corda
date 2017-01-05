@@ -175,13 +175,13 @@ inline fun elapsedTime(block: () -> Unit): Duration {
 }
 
 data class TestNodeConfiguration(
-    override val basedir: Path,
-    override val myLegalName: String,
-    override val networkMapService: NetworkMapInfo?,
-    override val keyStorePassword: String = "cordacadevpass",
-    override val trustStorePassword: String = "trustpass",
-    override val dataSourceProperties: Properties = makeTestDataSourceProperties(myLegalName),
-    override val nearestCity: String = "Null Island",
-    override val emailAddress: String = "",
-    override val exportJMXto: String = "",
-    override val devMode: Boolean = true) : NodeConfiguration
+        override val baseDirectory: Path,
+        override val myLegalName: String,
+        override val networkMapService: NetworkMapInfo?,
+        override val keyStorePassword: String = "cordacadevpass",
+        override val trustStorePassword: String = "trustpass",
+        override val dataSourceProperties: Properties = makeTestDataSourceProperties(myLegalName),
+        override val nearestCity: String = "Null Island",
+        override val emailAddress: String = "",
+        override val exportJMXto: String = "",
+        override val devMode: Boolean = true) : NodeConfiguration

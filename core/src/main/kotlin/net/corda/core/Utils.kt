@@ -135,6 +135,7 @@ fun Path.exists(vararg options: LinkOption): Boolean = Files.exists(this, *optio
 fun Path.moveTo(target: Path, vararg options: CopyOption): Path = Files.move(this, target, *options)
 fun Path.isRegularFile(vararg options: LinkOption): Boolean = Files.isRegularFile(this, *options)
 fun Path.isDirectory(vararg options: LinkOption): Boolean = Files.isDirectory(this, *options)
+fun Path.isSameFileAs(other: Path): Boolean = Files.isSameFile(this, other)
 val Path.size: Long get() = Files.size(this)
 inline fun <R> Path.list(block: (Stream<Path>) -> R): R = Files.list(this).use(block)
 fun Path.deleteIfExists(): Boolean = Files.deleteIfExists(this)

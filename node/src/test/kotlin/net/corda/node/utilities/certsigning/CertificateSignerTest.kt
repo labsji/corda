@@ -35,7 +35,7 @@ class CertificateSignerTest {
         }
 
         val config = TestNodeConfiguration(
-                basedir = tempFolder.root.toPath(),
+                baseDirectory = tempFolder.root.toPath(),
                 myLegalName = "me",
                 networkMapService = null)
 

@@ -17,8 +17,8 @@ import net.corda.flows.CashCommand
 import net.corda.flows.CashFlow
 import net.corda.node.driver.driver
 import net.corda.node.services.User
-import net.corda.node.services.config.FullNodeConfiguration
 import net.corda.node.services.config.NodeSSLConfiguration
+import net.corda.node.services.messaging.ArtemisMessagingComponent
 import net.corda.node.services.messaging.CordaRPCClient
 import net.corda.node.services.startFlowPermission
 import net.corda.node.services.transactions.ValidatingNotaryService
@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
         // END 1
 
         // START 2
-        val client = CordaRPCClient(FullNodeConfiguration(node.config).artemisAddress, sslConfig)
+        val client = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(node.nodeInfo.address), sslConfig)
         client.start("user", "password")
         val proxy = client.proxy()
 
