@@ -23,8 +23,7 @@ class ArgsParser {
         val optionSet = optionParser.parse(*args)
         val baseDirectory = Paths.get(optionSet.valueOf(baseDirectoryArg)).normalize().toAbsolutePath()
         val configFile =  optionSet.valueOf(configFileArg)?.let { Paths.get(it).normalize() }
-        val help = optionSet.has(helpArg)
-        return CmdLineOptions(help, optionSet.has(logToConsoleArg), baseDirectory, configFile)
+        return CmdLineOptions(optionSet.has(helpArg), optionSet.has(logToConsoleArg), baseDirectory, configFile)
     }
 
     fun printHelp(sink: PrintStream) = optionParser.printHelpOn(sink)

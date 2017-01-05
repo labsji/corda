@@ -26,7 +26,6 @@ import net.corda.flows.IssuerFlow.IssuanceRequester
 import net.corda.node.driver.PortAllocation
 import net.corda.node.driver.driver
 import net.corda.node.services.User
-import net.corda.node.services.config.FullNodeConfiguration
 import net.corda.node.services.messaging.ArtemisMessagingComponent
 import net.corda.node.services.messaging.CordaRPCClient
 import net.corda.node.services.startFlowPermission
@@ -143,19 +142,19 @@ fun main(args: Array<String>) {
             println("Running simulation mode ...")
 
             // Register with alice to use alice's RPC proxy to create random events.
-            val aliceClient = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(aliceNode.nodeInfo.address), FullNodeConfiguration(aliceNode.config))
+            val aliceClient = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(aliceNode.nodeInfo.address), aliceNode.configuration)
             aliceClient.start(user.username, user.password)
             val aliceRPC = aliceClient.proxy()
 
-            val bobClient = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(bobNode.nodeInfo.address), FullNodeConfiguration(bobNode.config))
+            val bobClient = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(bobNode.nodeInfo.address), bobNode.configuration)
             bobClient.start(user.username, user.password)
             val bobRPC = bobClient.proxy()
 
-            val issuerClientGBP = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(issuerNodeGBP.nodeInfo.address), FullNodeConfiguration(issuerNodeGBP.config))
+            val issuerClientGBP = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(issuerNodeGBP.nodeInfo.address), issuerNodeGBP.configuration)
             issuerClientGBP.start(manager.username, manager.password)
             val issuerRPCGBP = issuerClientGBP.proxy()
 
-            val issuerClientUSD = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(issuerNodeGBP.nodeInfo.address), FullNodeConfiguration(issuerNodeUSD.config))
+            val issuerClientUSD = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(issuerNodeGBP.nodeInfo.address), issuerNodeUSD.configuration)
             issuerClientUSD.start(manager.username, manager.password)
             val issuerRPCUSD = issuerClientUSD.proxy()
 

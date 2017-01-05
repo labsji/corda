@@ -55,13 +55,14 @@ fun main(args: Array<String>) {
 
     drawBanner()
 
+    System.setProperty("basedir", cmdlineOptions.baseDirectory.toString())
     System.setProperty("log-path", (cmdlineOptions.baseDirectory / "logs").toString())
 
     val log = LoggerFactory.getLogger("Main")
     printBasicNodeInfo("Logs can be found in", System.getProperty("log-path"))
 
     val conf = try {
-        FullNodeConfiguration(cmdlineOptions.loadConfig())
+        FullNodeConfiguration(cmdlineOptions.baseDirectory, cmdlineOptions.loadConfig())
     } catch (e: ConfigException) {
         println("Unable to load the configuration file: ${e.rootCause.message}")
         exitProcess(2)

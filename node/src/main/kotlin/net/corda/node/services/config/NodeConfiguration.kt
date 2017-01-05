@@ -17,17 +17,16 @@ import java.util.*
 interface NodeSSLConfiguration {
     val keyStorePassword: String
     val trustStorePassword: String
-    // TODO Rename to certificatesDirectory
-    val certificatesPath: Path
+    val certificatesDirectory: Path
     // TODO Rename to keyStoreFile
-    val keyStorePath: Path get() = certificatesPath / "sslkeystore.jks"
+    val keyStorePath: Path get() = certificatesDirectory / "sslkeystore.jks"
     // TODO Rename to trustStoreFile
-    val trustStorePath: Path get() = certificatesPath / "truststore.jks"
+    val trustStorePath: Path get() = certificatesDirectory / "truststore.jks"
 }
 
 interface NodeConfiguration : NodeSSLConfiguration {
     val baseDirectory: Path
-    override val certificatesPath: Path get() = baseDirectory / "certificates"
+    override val certificatesDirectory: Path get() = baseDirectory / "certificates"
     val myLegalName: String
     val networkMapService: NetworkMapInfo?
     val nearestCity: String
@@ -38,8 +37,11 @@ interface NodeConfiguration : NodeSSLConfiguration {
     val devMode: Boolean
 }
 
-class FullNodeConfiguration(val config: Config) : NodeConfiguration {
-    override val baseDirectory: Path by config
+/**
+ * [baseDirectory] is not defined by the config file - it's a command line argument when the node starts, which defaults
+ * to the node's working directory if it's not specified.
+ */
+class FullNodeConfiguration(override val baseDirectory: Path, val config: Config) : NodeConfiguration {
     override val myLegalName: String by config
     override val nearestCity: String by config
     override val emailAddress: String by config

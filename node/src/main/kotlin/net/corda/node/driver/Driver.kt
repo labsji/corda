@@ -93,7 +93,7 @@ interface DriverDSLInternalInterface : DriverDSLExposedInterface {
 
 data class NodeHandle(
         val nodeInfo: NodeInfo,
-        val config: Config,
+        val configuration: FullNodeConfiguration,
         val process: Process
 )
 
@@ -106,7 +106,7 @@ sealed class PortAllocation {
         override fun nextPort() = portCounter.andIncrement
     }
 
-    class RandomFree() : PortAllocation() {
+    class RandomFree : PortAllocation() {
         override fun nextPort(): Int {
             return ServerSocket().use {
                 it.bind(InetSocketAddress(0))
@@ -346,7 +346,6 @@ open class DriverDSL(
         val baseDirectory = driverDirectory / name
         val configOverrides = mapOf(
                 "myLegalName" to name,
-                "basedir" to baseDirectory.normalize().toString(),
                 "artemisAddress" to messagingAddress.toString(),
                 "webAddress" to apiAddress.toString(),
                 "extraAdvertisedServiceIds" to advertisedServices.joinToString(","),
@@ -364,16 +363,19 @@ open class DriverDSL(
                 }
         ) + customOverrides
 
-        val config = ConfigHelper.loadConfig(
-                baseDirectory = baseDirectory,
-                allowMissingConfig = true,
-                configOverrides = configOverrides
+        val configuration = FullNodeConfiguration(
+                baseDirectory,
+                ConfigHelper.loadConfig(
+                        baseDirectory = baseDirectory,
+                        allowMissingConfig = true,
+                        configOverrides = configOverrides
+                )
         )
 
-        val startNode = startNode(executorService, FullNodeConfiguration(config), quasarJarPath, debugPort)
+        val startNode = startNode(executorService, configuration, quasarJarPath, debugPort)
         registerProcess(startNode)
         return startNode.map {
-            NodeHandle(queryNodeInfo(apiAddress)!!, config, it)
+            NodeHandle(queryNodeInfo(apiAddress)!!, configuration, it)
         }
     }
 
@@ -422,7 +424,6 @@ open class DriverDSL(
                 allowMissingConfig = true,
                 configOverrides = mapOf(
                         "myLegalName" to networkMapLegalName,
-                        "basedir" to baseDirectory.normalize().toString(),
                         "artemisAddress" to networkMapAddress.toString(),
                         "webAddress" to apiAddress.toString(),
                         "extraAdvertisedServiceIds" to "",
@@ -431,7 +432,7 @@ open class DriverDSL(
         )
 
         log.info("Starting network-map-service")
-        val startNode = startNode(executorService, FullNodeConfiguration(config), quasarJarPath, debugPort)
+        val startNode = startNode(executorService, FullNodeConfiguration(baseDirectory, config), quasarJarPath, debugPort)
         registerProcess(startNode)
         return startNode
     }

@@ -53,7 +53,7 @@ fun main(args: Array<String>) {
         startNode("Notary", advertisedServices = setOf(ServiceInfo(ValidatingNotaryService.type)))
         val node = startNode("Alice", rpcUsers = listOf(user)).get()
         val sslConfig = object : NodeSSLConfiguration {
-            override val certificatesPath = baseDirectory / "Alice" / "certificates"
+            override val certificatesDirectory = baseDirectory / "Alice" / "certificates"
             override val keyStorePassword = "cordacadevpass"
             override val trustStorePassword = "trustpass"
         }

@@ -31,7 +31,7 @@ class CertificateSigner(val config: NodeConfiguration, val certService: Certific
     }
 
     fun buildKeyStore() {
-        config.certificatesPath.createDirectories()
+        config.certificatesDirectory.createDirectories()
 
         val caKeyStore = X509Utilities.loadOrCreateKeyStore(config.keyStorePath, config.keyStorePassword)
 
@@ -96,7 +96,7 @@ class CertificateSigner(val config: NodeConfiguration, val certService: Certific
      * @return Request ID return from the server.
      */
     private fun submitCertificateSigningRequest(keyPair: KeyPair): String {
-        val requestIdStore = config.certificatesPath / "certificate-request-id.txt"
+        val requestIdStore = config.certificatesDirectory / "certificate-request-id.txt"
         // Retrieve request id from file if exists, else post a request to server.
         return if (!requestIdStore.exists()) {
             val request = X509Utilities.createCertificateSigningRequest(config.myLegalName, config.nearestCity, config.emailAddress, keyPair)
@@ -121,7 +121,7 @@ fun main(args: Array<String>) {
         exitProcess(1)
     }
     val config = cmdlineOptions.loadConfig(allowMissingConfig = true)
-    val configuration = object : NodeConfiguration by FullNodeConfiguration(config) {
+    val configuration = object : NodeConfiguration by FullNodeConfiguration(cmdlineOptions.baseDirectory, config) {
         val certificateSigningService: URL by config
     }
 

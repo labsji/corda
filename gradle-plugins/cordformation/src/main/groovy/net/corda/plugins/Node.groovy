@@ -1,10 +1,9 @@
 package net.corda.plugins
 
-import com.typesafe.config.*
 import org.gradle.api.Project
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-
 /**
  * Represents a node that will be installed.
  */
@@ -55,16 +54,6 @@ class Node {
     void name(String name) {
         this.name = name
         config = config.withValue("myLegalName", ConfigValueFactory.fromAnyRef(name))
-    }
-
-    /**
-     * Set the directory the node will be installed to relative to the directory specified in Cordform task.
-     *
-     * @param dirName Subdirectory name for node to be installed to. Must be valid directory name on all OSes.
-     */
-    void dirName(String dirName) {
-        this.dirName = dirName
-        config = config.withValue("basedir", ConfigValueFactory.fromAnyRef(dirName))
     }
 
     /**

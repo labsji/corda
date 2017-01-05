@@ -97,7 +97,7 @@ inline fun <reified T : Any> Config.getListOrElse(path: String, default: Config.
 fun NodeConfiguration.configureWithDevSSLCertificate() = configureDevKeyAndTrustStores(myLegalName)
 
 private fun NodeSSLConfiguration.configureDevKeyAndTrustStores(myLegalName: String) {
-    certificatesPath.createDirectories()
+    certificatesDirectory.createDirectories()
     if (!trustStorePath.exists()) {
         javaClass.classLoader.getResourceAsStream("net/corda/node/internal/certificates/cordatruststore.jks").copyTo(trustStorePath)
     }
@@ -112,7 +112,7 @@ private fun NodeSSLConfiguration.configureDevKeyAndTrustStores(myLegalName: Stri
 // TODO Move this to CoreTestUtils.kt once we can pry this from the explorer
 @JvmOverloads
 fun configureTestSSL(legalName: String = "Mega Corp."): NodeSSLConfiguration = object : NodeSSLConfiguration {
-    override val certificatesPath = Files.createTempDirectory("certs")
+    override val certificatesDirectory = Files.createTempDirectory("certs")
     override val keyStorePassword: String get() = "cordacadevpass"
     override val trustStorePassword: String get() = "trustpass"
 

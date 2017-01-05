@@ -1,6 +1,8 @@
 package net.corda.bank
 
+import com.google.common.util.concurrent.Futures
 import net.corda.core.contracts.DOLLARS
+import net.corda.core.getOrThrow
 import net.corda.core.messaging.startFlow
 import net.corda.core.node.services.ServiceInfo
 import net.corda.core.transactions.SignedTransaction
@@ -11,7 +13,10 @@ import net.corda.node.services.config.configureTestSSL
 import net.corda.node.services.messaging.CordaRPCClient
 import net.corda.node.services.startFlowPermission
 import net.corda.node.services.transactions.SimpleNotaryService
-import net.corda.testing.*
+import net.corda.testing.BOC_PARTY_REF
+import net.corda.testing.expect
+import net.corda.testing.expectEvents
+import net.corda.testing.sequence
 import org.junit.Test
 import kotlin.test.assertTrue
 
@@ -20,10 +25,12 @@ class BankOfCordaRPCClientTest {
     @Test fun `test issuer flow via RPC`() {
         driver(dsl = {
             val user = User("user1", "test", permissions = setOf(startFlowPermission<IssuanceRequester>()))
-            val nodeBankOfCorda = startNode("BankOfCorda", setOf(ServiceInfo(SimpleNotaryService.type)), arrayListOf(user)).get()
-            val nodeBankOfCordaApiAddr = nodeBankOfCorda.config.getHostAndPort("artemisAddress")
+            val (nodeBankOfCorda, nodeBigCorporation) = Futures.allAsList(
+                startNode("BankOfCorda", setOf(ServiceInfo(SimpleNotaryService.type)), listOf(user)),
+                startNode("BigCorporation", rpcUsers = listOf(user))
+            ).getOrThrow()
+            val nodeBankOfCordaApiAddr = nodeBankOfCorda.configuration.artemisAddress
             val bankOfCordaParty = nodeBankOfCorda.nodeInfo.legalIdentity
-            val nodeBigCorporation = startNode("BigCorporation", rpcUsers = arrayListOf(user)).get()
             val bigCorporationParty = nodeBigCorporation.nodeInfo.legalIdentity
 
             // Bank of Corda RPC Client
@@ -51,13 +58,13 @@ class BankOfCordaRPCClientTest {
                 sequence(
                         // ISSUE
                         expect { update ->
-                            require(update.consumed.size == 0) { update.consumed.size }
+                            require(update.consumed.isEmpty()) { update.consumed.size }
                             require(update.produced.size == 1) { update.produced.size }
                         },
                         // MOVE
                         expect { update ->
                             require(update.consumed.size == 1) { update.consumed.size }
-                            require(update.produced.size == 0) { update.produced.size }
+                            require(update.produced.isEmpty()) { update.produced.size }
                         }
                 )
             }
@@ -67,13 +74,13 @@ class BankOfCordaRPCClientTest {
                 sequence(
                         // ISSUE
                         expect { update ->
-                            require(update.consumed.size == 0) { update.consumed.size }
+                            require(update.consumed.isEmpty()) { update.consumed.size }
                             require(update.produced.size == 1) { update.produced.size }
                         },
                         // MOVE
                         expect { update ->
                             require(update.consumed.size == 1) { update.consumed.size }
-                            require(update.produced.size == 0) { update.produced.size }
+                            require(update.produced.isEmpty()) { update.produced.size }
                         }
                 )
             }
