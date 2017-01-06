@@ -142,19 +142,19 @@ fun main(args: Array<String>) {
             println("Running simulation mode ...")
 
             // Register with alice to use alice's RPC proxy to create random events.
-            val aliceClient = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(aliceNode.nodeInfo.address), aliceNode.configuration)
+            val aliceClient = CordaRPCClient(aliceNode.configuration.artemisAddress, aliceNode.configuration)
             aliceClient.start(user.username, user.password)
             val aliceRPC = aliceClient.proxy()
 
-            val bobClient = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(bobNode.nodeInfo.address), bobNode.configuration)
+            val bobClient = CordaRPCClient(bobNode.configuration.artemisAddress, bobNode.configuration)
             bobClient.start(user.username, user.password)
             val bobRPC = bobClient.proxy()
 
-            val issuerClientGBP = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(issuerNodeGBP.nodeInfo.address), issuerNodeGBP.configuration)
+            val issuerClientGBP = CordaRPCClient(issuerNodeGBP.configuration.artemisAddress, issuerNodeGBP.configuration)
             issuerClientGBP.start(manager.username, manager.password)
             val issuerRPCGBP = issuerClientGBP.proxy()
 
-            val issuerClientUSD = CordaRPCClient(ArtemisMessagingComponent.toHostAndPort(issuerNodeGBP.nodeInfo.address), issuerNodeUSD.configuration)
+            val issuerClientUSD = CordaRPCClient(issuerNodeUSD.configuration.artemisAddress, issuerNodeUSD.configuration)
             issuerClientUSD.start(manager.username, manager.password)
             val issuerRPCUSD = issuerClientUSD.proxy()
 

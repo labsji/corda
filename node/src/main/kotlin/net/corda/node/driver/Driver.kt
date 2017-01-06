@@ -19,6 +19,7 @@ import net.corda.core.utilities.loggerFor
 import net.corda.node.services.User
 import net.corda.node.services.config.ConfigHelper
 import net.corda.node.services.config.FullNodeConfiguration
+import net.corda.node.services.messaging.CordaRPCClient
 import net.corda.node.services.messaging.NodeMessagingClient
 import net.corda.node.services.network.NetworkMapService
 import net.corda.node.services.transactions.RaftValidatingNotaryService
@@ -95,7 +96,9 @@ data class NodeHandle(
         val nodeInfo: NodeInfo,
         val configuration: FullNodeConfiguration,
         val process: Process
-)
+) {
+    fun rpcToNode(): CordaRPCClient = CordaRPCClient(configuration.artemisAddress, configuration)
+}
 
 sealed class PortAllocation {
     abstract fun nextPort(): Int
@@ -152,7 +155,7 @@ fun <A> driver(
         driverDsl = DriverDSL(
                 portAllocation = portAllocation,
                 debugPortAllocation = debugPortAllocation,
-                driverDirectory = driverDirectory,
+                driverDirectory = driverDirectory.toAbsolutePath(),
                 useTestClock = useTestClock,
                 isDebug = isDebug
         ),
